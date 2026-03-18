@@ -52,6 +52,7 @@
       background: rgba(255, 255, 255, 0.35);
       z-index: 40;
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
     .progress .bar {
@@ -59,7 +60,8 @@
       height: 100%;
       background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, white), var(--accent));
       box-shadow: 0 0 12px var(--glow);
-      transition: width 80ms linear;
+      transition: width 100ms linear;
+      will-change: width;
     }
 
     .grain {
@@ -71,13 +73,14 @@
       background-image: radial-gradient(rgba(0, 0, 0, 0.18) 0.4px, transparent 0.4px);
       background-size: 3px 3px;
       animation: grainShift 5s steps(3) infinite;
+      will-change: transform;
     }
 
     @keyframes grainShift {
-      0% { transform: translate(0, 0); }
-      30% { transform: translate(-2px, 1px); }
-      60% { transform: translate(2px, -1px); }
-      100% { transform: translate(0, 0); }
+      0% { transform: translate3d(0, 0, 0); }
+      30% { transform: translate3d(-2px, 1px, 0); }
+      60% { transform: translate3d(2px, -1px, 0); }
+      100% { transform: translate3d(0, 0, 0); }
     }
 
     canvas#dust {
@@ -90,21 +93,15 @@
       opacity: 0.5;
     }
 
-    .hearts {
+    .hearts, .petals {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 20;
       overflow: hidden;
     }
-
-    .petals {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 18;
-      overflow: hidden;
-    }
+    
+    .hearts { z-index: 20; }
+    .petals { z-index: 18; }
 
     .petal {
       position: absolute;
@@ -112,14 +109,14 @@
       color: color-mix(in srgb, var(--accent) 75%, white 25%);
       font-size: 14px;
       opacity: 0.85;
-      filter: blur(0.2px);
       animation: petalFall linear forwards;
+      will-change: transform, opacity;
     }
 
     @keyframes petalFall {
-      0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+      0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
       12% { opacity: 0.85; }
-      100% { transform: translateY(112vh) translateX(80px) rotate(160deg); opacity: 0; }
+      100% { transform: translate3d(80px, 112vh, 0) rotate(160deg); opacity: 0; }
     }
 
     .heart {
@@ -128,14 +125,15 @@
       color: color-mix(in srgb, var(--accent) 85%, #ffffff 15%);
       font-size: 14px;
       opacity: 0.85;
-      filter: drop-shadow(0 3px 8px var(--glow));
+      text-shadow: 0 3px 8px var(--glow); /* drop-shadow evezine text-shadow daha yunguldur */
       animation: heartUp linear forwards;
+      will-change: transform, opacity;
     }
 
     @keyframes heartUp {
-      0% { transform: translateY(0) rotate(0deg) scale(0.7); opacity: 0; }
+      0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.7); opacity: 0; }
       10% { opacity: 0.85; }
-      100% { transform: translateY(-112vh) rotate(16deg) scale(1.35); opacity: 0; }
+      100% { transform: translate3d(0, -112vh, 0) rotate(16deg) scale(1.35); opacity: 0; }
     }
 
     .container {
@@ -194,17 +192,18 @@
 
     .line {
       display: block;
-      transform: translateY(24px);
+      transform: translate3d(0, 24px, 0);
       opacity: 0;
       filter: blur(6px);
       animation: titleReveal 800ms ease forwards;
+      will-change: transform, opacity, filter;
     }
 
     .line:nth-child(2) { animation-delay: 220ms; }
     .line:nth-child(3) { animation-delay: 380ms; color: var(--accent); }
 
     @keyframes titleReveal {
-      to { transform: translateY(0); opacity: 1; filter: blur(0); }
+      to { transform: translate3d(0, 0, 0); opacity: 1; filter: blur(0); }
     }
 
     .lead {
@@ -258,7 +257,6 @@
       font-size: 138px;
       fill: color-mix(in srgb, var(--accent) 90%, #ffffff 10%);
       opacity: 0;
-      filter: drop-shadow(0 5px 14px color-mix(in srgb, var(--accent) 30%, transparent));
       animation: fillName 800ms ease forwards 2.5s;
     }
 
@@ -275,7 +273,7 @@
     }
 
     @keyframes fillName {
-      to { opacity: 1; }
+      to { opacity: 1; filter: drop-shadow(0 5px 14px color-mix(in srgb, var(--accent) 30%, transparent)); }
     }
 
     .btn {
@@ -312,11 +310,12 @@
       margin: 0 auto;
       position: relative;
       animation: float 5.2s ease-in-out infinite;
+      will-change: transform;
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(0, -10px, 0); }
     }
 
     .photo-backdrop {
@@ -327,15 +326,16 @@
       background-position: center;
       filter: blur(22px) saturate(1.15);
       opacity: 0.36;
-      transform: scale(1.08);
+      transform: scale(1.08) translateZ(0);
       z-index: 0;
       border-radius: 36px;
       animation: pulseBlur 7s ease-in-out infinite;
+      will-change: transform, opacity;
     }
 
     @keyframes pulseBlur {
-      0%, 100% { opacity: 0.32; transform: scale(1.08); }
-      50% { opacity: 0.45; transform: scale(1.13); }
+      0%, 100% { opacity: 0.32; transform: scale(1.08) translateZ(0); }
+      50% { opacity: 0.45; transform: scale(1.13) translateZ(0); }
     }
 
     .photo-main {
@@ -348,22 +348,24 @@
         0 22px 50px rgba(0, 0, 0, 0.24),
         0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent);
       transform-style: preserve-3d;
-      transition: transform 180ms ease;
+      transition: transform 100ms ease-out;
       z-index: 2;
       background: #ddd;
+      will-change: transform;
     }
 
     .photo-main img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transform: scale(1.04);
+      transform: scale(1.04) translateZ(0);
       animation: zoomLoop 6.6s ease-in-out infinite;
+      will-change: transform;
     }
 
     @keyframes zoomLoop {
-      0%, 100% { transform: scale(1.04); }
-      50% { transform: scale(1.09); }
+      0%, 100% { transform: scale(1.04) translateZ(0); }
+      50% { transform: scale(1.09) translateZ(0); }
     }
 
     .shine {
@@ -373,10 +375,11 @@
       width: 42%;
       height: 140%;
       background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.43), transparent);
-      transform: rotate(12deg);
+      transform: rotate(12deg) translateZ(0);
       animation: shineMove 3.4s linear infinite;
       z-index: 4;
       pointer-events: none;
+      will-change: left;
     }
 
     @keyframes shineMove {
@@ -393,11 +396,12 @@
       box-shadow: 0 0 40px var(--glow);
       animation: ringPulse 2.5s ease-in-out infinite;
       pointer-events: none;
+      will-change: transform, opacity;
     }
 
     @keyframes ringPulse {
-      0%, 100% { opacity: 0.6; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.02); }
+      0%, 100% { opacity: 0.6; transform: scale(1) translateZ(0); }
+      50% { opacity: 1; transform: scale(1.02) translateZ(0); }
     }
 
     .mini {
@@ -411,6 +415,7 @@
       z-index: 5;
       animation: miniSwing 4s ease-in-out infinite;
       background: #ddd;
+      will-change: transform;
     }
 
     .mini img {
@@ -435,9 +440,12 @@
     }
 
     @keyframes miniSwing {
-      0%, 100% { translate: 0 0; }
-      50% { translate: 0 -8px; }
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--rot, 0deg)); }
+      50% { transform: translate3d(0, -8px, 0) rotate(var(--rot, 0deg)); }
     }
+    
+    .mini.a { --rot: -8deg; }
+    .mini.b { --rot: 10deg; }
 
     .ribbon {
       position: absolute;
@@ -479,6 +487,7 @@
       background: var(--card);
       border-radius: 20px;
       backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       padding: 22px;
       box-shadow: 0 16px 30px rgba(0, 0, 0, 0.08);
       opacity: 0;
@@ -513,6 +522,7 @@
       background: var(--card);
       border-radius: 24px;
       backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
       box-shadow: 0 16px 30px rgba(0, 0, 0, 0.09);
       padding: 24px;
       opacity: 0;
@@ -600,6 +610,7 @@
         var(--card);
       border-radius: 28px;
       backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
       padding: clamp(26px, 4vw, 42px);
       box-shadow: 0 22px 40px rgba(0, 0, 0, 0.1);
       opacity: 0;
@@ -645,7 +656,7 @@
     }
 
     @keyframes inUp {
-      to { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
     }
 
     @media (max-width: 1020px) {
@@ -859,14 +870,23 @@
     }
     setInterval(fallPetal, 520);
 
+    // MOUSEMOVE OPTIMIZASIYASI (RequestAnimationFrame ile)
     const photo = document.getElementById("photoMain");
+    let isTicking = false;
     window.addEventListener("mousemove", (e) => {
-      const rx = (e.clientY / window.innerHeight - 0.5) * -10;
-      const ry = (e.clientX / window.innerWidth - 0.5) * 10;
-      photo.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+      if (!isTicking) {
+        window.requestAnimationFrame(() => {
+          const rx = (e.clientY / window.innerHeight - 0.5) * -10;
+          const ry = (e.clientX / window.innerWidth - 0.5) * 10;
+          photo.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+          isTicking = false;
+        });
+        isTicking = true;
+      }
     });
+    
     window.addEventListener("mouseleave", () => {
-      photo.style.transform = "rotateX(0deg) rotateY(0deg)";
+      photo.style.transform = "rotateX(0deg) rotateY(0deg) translateZ(0)";
     });
 
     const canvas = document.getElementById("dust");
@@ -904,14 +924,24 @@
     setupCanvas();
     draw();
 
+    // SCROLL OPTIMIZASIYASI
     const progressBar = document.getElementById("progressBar");
+    let isScrolling = false;
     function updateProgress() {
       const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const ratio = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
       progressBar.style.width = `${ratio}%`;
     }
-    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("scroll", () => {
+      if (!isScrolling) {
+        window.requestAnimationFrame(() => {
+          updateProgress();
+          isScrolling = false;
+        });
+        isScrolling = true;
+      }
+    }, { passive: true });
     updateProgress();
   </script>
 </body>
